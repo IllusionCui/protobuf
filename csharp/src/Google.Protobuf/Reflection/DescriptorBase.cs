@@ -87,6 +87,6 @@ namespace Google.Protobuf.Reflection
         /// If the field is unknown or not a nested descriptor list, return null to terminate the search.
         /// The default implementation returns null.
         /// </summary>
-        internal virtual IReadOnlyList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber) => null;
+        internal virtual IList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber) => null;
     }
 }

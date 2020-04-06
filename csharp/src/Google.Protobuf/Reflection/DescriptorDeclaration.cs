@@ -89,7 +89,7 @@ namespace Google.Protobuf.Reflection
         /// Leading whitespace and the comment marker ("//") are removed from each line.
         /// The list is never null, but may be empty. Likewise each element is never null, but may be empty.
         /// </summary>
-        public IReadOnlyList<string> LeadingDetachedComments { get; }
+        public IList<string> LeadingDetachedComments { get; }
 
         private DescriptorDeclaration(IDescriptor descriptor, Location location)
         {

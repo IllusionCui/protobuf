@@ -119,16 +119,16 @@ namespace Google.Protobuf.Reflection
         /// </summary>
         public override string Name => Proto.Name;
 
-        internal override IReadOnlyList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber)
+        internal override IList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber)
         {
             switch (fieldNumber)
             {
                 case DescriptorProto.FieldFieldNumber:
-                    return (IReadOnlyList<DescriptorBase>) fieldsInDeclarationOrder;
+                    return (IList<DescriptorBase>) fieldsInDeclarationOrder;
                 case DescriptorProto.NestedTypeFieldNumber:
-                    return (IReadOnlyList<DescriptorBase>) NestedTypes;
+                    return (IList<DescriptorBase>) NestedTypes;
                 case DescriptorProto.EnumTypeFieldNumber:
-                    return (IReadOnlyList<DescriptorBase>) EnumTypes;
+                    return (IList<DescriptorBase>) EnumTypes;
                 default:
                     return null;
             }

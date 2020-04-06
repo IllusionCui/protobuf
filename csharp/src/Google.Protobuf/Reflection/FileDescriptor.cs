@@ -144,7 +144,7 @@ namespace Google.Protobuf.Reflection
             {
                 return null;
             }
-            IReadOnlyList<DescriptorBase> topLevelList = GetNestedDescriptorListForField(path[0]);
+            IList<DescriptorBase> topLevelList = GetNestedDescriptorListForField(path[0]);
             DescriptorBase current = GetDescriptorFromList(topLevelList, path[1]);
 
             for (int i = 2; current != null && i < path.Count; i += 2)
@@ -155,7 +155,7 @@ namespace Google.Protobuf.Reflection
             return current;
         }
 
-        private DescriptorBase GetDescriptorFromList(IReadOnlyList<DescriptorBase> list, int index)
+        private DescriptorBase GetDescriptorFromList(IList<DescriptorBase> list, int index)
         {
             // This is fine: it may be a newer version of protobuf than we understand, with a new descriptor
             // field.
@@ -173,16 +173,16 @@ namespace Google.Protobuf.Reflection
             return list[index];
         }
 
-        private IReadOnlyList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber)
+        private IList<DescriptorBase> GetNestedDescriptorListForField(int fieldNumber)
         {
             switch (fieldNumber)
             {
                 case FileDescriptorProto.ServiceFieldNumber:
-                    return (IReadOnlyList<DescriptorBase>) Services;
+                    return (IList<DescriptorBase>) Services;
                 case FileDescriptorProto.MessageTypeFieldNumber:
-                    return (IReadOnlyList<DescriptorBase>) MessageTypes;
+                    return (IList<DescriptorBase>) MessageTypes;
                 case FileDescriptorProto.EnumTypeFieldNumber:
-                    return (IReadOnlyList<DescriptorBase>) EnumTypes;
+                    return (IList<DescriptorBase>) EnumTypes;
                 default:
                     return null;
             }
@@ -482,7 +482,7 @@ namespace Google.Protobuf.Reflection
         /// depends on C, then the descriptors must be presented in the order C, B, A.) This is compatible
         /// with the order in which protoc provides descriptors to plugins.</param>
         /// <returns>The file descriptors corresponding to <paramref name="descriptorData"/>.</returns>
-        public static IReadOnlyList<FileDescriptor> BuildFromByteStrings(IEnumerable<ByteString> descriptorData)
+        public static IList<FileDescriptor> BuildFromByteStrings(IEnumerable<ByteString> descriptorData)
         {
             ProtoPreconditions.CheckNotNull(descriptorData, nameof(descriptorData));
 
