@@ -78,7 +78,11 @@ namespace Google.Protobuf.Reflection
             ForceReflectionInitialization<Value.KindOneofCase>();
         }
 
+#if NET35
+        private readonly Dictionary<IDescriptor, DescriptorDeclaration> declarations;
+#else
         private readonly Lazy<Dictionary<IDescriptor, DescriptorDeclaration>> declarations;
+#endif
 
         private FileDescriptor(ByteString descriptorData, FileDescriptorProto proto, IEnumerable<FileDescriptor> dependencies, DescriptorPool pool, bool allowUnknownDependencies, GeneratedClrTypeInfo generatedCodeInfo)
         {
@@ -104,8 +108,11 @@ namespace Google.Protobuf.Reflection
                                                              new ServiceDescriptor(service, this, index));
 
             Extensions = new ExtensionCollection(this, generatedCodeInfo?.Extensions);
-
+#if NET35
+            declarations = CreateDeclarationMap();
+#else
             declarations = new Lazy<Dictionary<IDescriptor, DescriptorDeclaration>>(CreateDeclarationMap, LazyThreadSafetyMode.ExecutionAndPublication);
+#endif
 
             if (!proto.HasSyntax || proto.Syntax == "proto2")
             {
@@ -191,7 +198,11 @@ namespace Google.Protobuf.Reflection
         internal DescriptorDeclaration GetDeclaration(IDescriptor descriptor)
         {
             DescriptorDeclaration declaration;
+#if NET35
+            declarations.TryGetValue(descriptor, out declaration);
+#else
             declarations.Value.TryGetValue(descriptor, out declaration);
+#endif
             return declaration;
         }
 
