@@ -272,6 +272,14 @@ namespace Google.Protobuf.Reflection
                     var type = extensionValue.GetType();
                     if (type.GetGenericTypeDefinition() == typeof(ExtensionValue<>))
                     {
+#if NET35
+                        var typeArgs = type.GetGenericArguments();
+                        if (typeArgs.Length == 1 && typeArgs[0].IsEnum)
+                        {
+                            value = (T)type.GetMethod(nameof(ExtensionValue<T>.GetValue), BindingFlags.DeclaredOnly).Invoke(extensionValue, EmptyParameters);
+                            return true;
+                        }
+#else
                         var typeInfo = type.GetTypeInfo();
                         var typeArgs = typeInfo.GenericTypeArguments;
                         if (typeArgs.Length == 1 && typeArgs[0].GetTypeInfo().IsEnum)
@@ -279,9 +287,22 @@ namespace Google.Protobuf.Reflection
                             value = (T)typeInfo.GetDeclaredMethod(nameof(ExtensionValue<T>.GetValue)).Invoke(extensionValue, EmptyParameters);
                             return true;
                         }
+#endif
                     }
                     else if (type.GetGenericTypeDefinition() == typeof(RepeatedExtensionValue<>))
                     {
+#if NET35
+                        var typeArgs = type.GetGenericArguments();
+                        if (typeArgs.Length == 1 && typeArgs[0].IsEnum)
+                        {
+                            var values = (IList)type.GetMethod(nameof(RepeatedExtensionValue<T>.GetValue), BindingFlags.DeclaredOnly).Invoke(extensionValue, EmptyParameters);
+                            if (values.Count != 0)
+                            {
+                                value = (T)values[values.Count - 1];
+                                return true;
+                            }
+                        }
+#else
                         var typeInfo = type.GetTypeInfo();
                         var typeArgs = typeInfo.GenericTypeArguments;
                         if (typeArgs.Length == 1 && typeArgs[0].GetTypeInfo().IsEnum)
@@ -293,6 +314,7 @@ namespace Google.Protobuf.Reflection
                                 return true;
                             }
                         }
+#endif
                     }
                 }
             }

@@ -123,7 +123,11 @@ namespace Google.Protobuf.Reflection
         /// the type that declares the method, and the second argument to the first parameter type of the method.
         /// </summary>
         internal static IExtensionReflectionHelper CreateExtensionHelper(Extension extension) =>
+#if NET35
+            (IExtensionReflectionHelper)Activator.CreateInstance(typeof(ExtensionReflectionHelper<,>).MakeGenericType(extension.TargetType, extension.GetType().GetGenericArguments()[1]), extension);
+#else
             (IExtensionReflectionHelper)Activator.CreateInstance(typeof(ExtensionReflectionHelper<,>).MakeGenericType(extension.TargetType, extension.GetType().GenericTypeArguments[1]), extension);
+#endif
 
         /// <summary>
         /// Creates a reflection helper for the given type arguments. Currently these are created on demand
@@ -312,17 +316,22 @@ namespace Google.Protobuf.Reflection
         {
             public Func<IMessage, bool> CreateIsInitializedCaller()
             {
-                var prop = typeof(T1).GetTypeInfo().GetDeclaredProperty("_Extensions");
 #if NET35
+                var prop = typeof(T1).GetProperty("_Extensions", BindingFlags.DeclaredOnly);
                 var getFunc = (Func<T1, ExtensionSet<T1>>)prop.GetGetMethod(true).CreateDelegate(typeof(Func<T1, ExtensionSet<T1>>));
+                var initializedFunc = (Func<ExtensionSet<T1>, bool>)
+                    typeof(ExtensionSet<T1>)
+                        .GetMethod("IsInitialized", BindingFlags.DeclaredOnly)
+                        .CreateDelegate(typeof(Func<ExtensionSet<T1>, bool>));
 #else
+                var prop = typeof(T1).GetTypeInfo().GetDeclaredProperty("_Extensions");
                 var getFunc = (Func<T1, ExtensionSet<T1>>)prop.GetMethod.CreateDelegate(typeof(Func<T1, ExtensionSet<T1>>));
-#endif
                 var initializedFunc = (Func<ExtensionSet<T1>, bool>)
                     typeof(ExtensionSet<T1>)
                         .GetTypeInfo()
                         .GetDeclaredMethod("IsInitialized")
                         .CreateDelegate(typeof(Func<ExtensionSet<T1>, bool>));
+#endif
                 return (m) => {
                     var set = getFunc((T1)m);
                     return set == null || initializedFunc(set);

@@ -74,12 +74,20 @@ namespace Google.Protobuf.Reflection
             }
             else
             {
+#if NET35
+                MethodInfo hasMethod = property.DeclaringType.GetProperty("Has" + property.Name).GetGetMethod();
+#else
                 MethodInfo hasMethod = property.DeclaringType.GetRuntimeProperty("Has" + property.Name).GetMethod;
+#endif
                 if (hasMethod == null) {
                   throw new ArgumentException("Not all required properties/methods are available");
                 }
                 hasDelegate = ReflectionUtil.CreateFuncIMessageBool(hasMethod);
+#if NET35
+                MethodInfo clearMethod = property.DeclaringType.GetMethod("Clear" + property.Name);
+#else
                 MethodInfo clearMethod = property.DeclaringType.GetRuntimeMethod("Clear" + property.Name, ReflectionUtil.EmptyTypes);
+#endif
                 if (clearMethod == null) {
                   throw new ArgumentException("Not all required properties/methods are available");
                 }
